@@ -7,9 +7,6 @@ namespace Ex10
     {
         static async Task Main()
         {
-            /*
-             * Il y a un problème au niveau de l'API !
-             */
             const string apiKey = "07fe7c9cb884df2bdc06c47ec07b6e87"; // 🔑 OpenWeatherMap
             var villes = new List<string>
             {
