@@ -42,7 +42,7 @@ namespace Ex06_OperationsEnsemblistes.Services
                 .Union(candidat2.Competences.Select(c => c.Nom));
         }
 
-        // ⭐ Bonus : meilleur candidat pour une offre
+        // BONUS : meilleur candidat pour une offre
         public Candidat TrouverMeilleurCandidatPourOffre(
             List<Candidat> candidats,
             OffreEmploi offre)

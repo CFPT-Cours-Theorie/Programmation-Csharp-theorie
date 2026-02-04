@@ -21,7 +21,7 @@ namespace Ex02
 
             Console.WriteLine();
 
-            // ⭐ BONUS : Recherche par nom
+            // BONUS : Recherche par nom
             var recherche = await service.RechercherParNomAsync("Leanne");
             if (recherche != null)
             {

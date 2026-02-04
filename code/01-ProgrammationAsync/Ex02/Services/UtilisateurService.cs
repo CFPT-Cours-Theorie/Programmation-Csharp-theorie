@@ -42,7 +42,7 @@ namespace Ex02.Services
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
-        // ⭐ BONUS
+        // BONUS
         public async Task<Utilisateur?> RechercherParNomAsync(string nom)
         {
             var utilisateurs = await ObtenirTousUtilisateursAsync();

@@ -41,7 +41,7 @@ namespace Ex02
                 service.TrierParAnciennete(),
                 "Par ancienneté (plus ancien en premier)");
 
-            // Bonus
+            // BONUS
             view.AfficherTableauEmployes(
                 service.TrierParDepartementPuisSalaireDecroissant(),
                 "Par département puis salaire décroissant");

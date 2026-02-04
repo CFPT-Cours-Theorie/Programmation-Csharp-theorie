@@ -12,7 +12,7 @@ namespace Ex09_GestionnaireTelechargements.Services
     {
         private readonly HttpClient _client = new HttpClient();
         private readonly List<Telechargement> _historique = new();
-        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(3); // ⭐ BONUS
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(3); // BONUS
 
         public async Task<bool> TelechargerFichierAsync(
             string url,

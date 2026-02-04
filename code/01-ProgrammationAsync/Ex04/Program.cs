@@ -27,7 +27,7 @@ namespace Ex04
             // Comparaison
             view.AfficherComparaison(resultatsSequentiels, resultatsParalleles);
 
-            // ⭐ BONUS
+            // BONUS
             Console.WriteLine("\n--- BONUS : résultats au fil de l’eau ---");
             await service.TelechargerAvecRetourProgressifAsync(
                 urls,

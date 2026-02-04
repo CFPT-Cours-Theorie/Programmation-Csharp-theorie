@@ -16,7 +16,7 @@ namespace Ex08_VerificationsAnyAllContains.Services
             this.taches = taches;
         }
 
-        // 1️⃣ Any
+        // Any
         public bool ExisteTachesEnRetard()
         {
             return taches.Any(t =>
@@ -24,13 +24,13 @@ namespace Ex08_VerificationsAnyAllContains.Services
                 t.DateEcheance < DateTime.Now);
         }
 
-        // 2️⃣ All
+        // All
         public bool ToutesTachesTerminees()
         {
             return taches.All(t => t.EstTerminee);
         }
 
-        // 3️⃣ Any avec condition
+        // Any avec condition
         public bool ExisteTacheAvecPriorite(int priorite)
         {
             return taches.Any(t => t.Priorite == priorite);
@@ -60,7 +60,7 @@ namespace Ex08_VerificationsAnyAllContains.Services
             return resultat;
         }
 
-        // ⭐ Bonus
+        // BONUS
         public bool ToutesTachesUrgentesTerminees()
         {
             return taches

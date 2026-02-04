@@ -42,7 +42,7 @@ namespace Ex07
             var page2 = service.ObtenirPage(2, 5);
             view.AfficherPage(page2);
 
-            // ⭐ Bonus : navigation interactive
+            // BONUS : navigation interactive
             int pageCourante = 1;
             int taillePage = 5;
             ConsoleKey key;

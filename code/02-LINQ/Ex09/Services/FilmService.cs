@@ -65,7 +65,7 @@ namespace Ex09.Services
                 .Select(g => g.Key);
         }
 
-        // ⭐ Bonus : année avec le plus de films
+        // BONUS : année avec le plus de films
         public int AnneeLaPlusProlifique()
         {
             return _films

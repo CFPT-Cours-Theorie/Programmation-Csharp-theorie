@@ -37,7 +37,7 @@ namespace Ex01
                 service.ObtenirEtudiantsParTrancheAge(20, 25),
                 "Étudiants entre 20 et 25 ans");
 
-            // Bonus
+            // BONUS
             view.AfficherListeEtudiants(
                 service.ObtenirEtudiantsDontNomCommencePar('D'),
                 "Étudiants dont le nom commence par D");

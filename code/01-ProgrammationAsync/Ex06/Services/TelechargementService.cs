@@ -73,7 +73,7 @@ namespace Ex06_GestionErreurs.Services
                     });
                 }
 
-                // ⭐ BONUS : délai exponentiel (2s, 4s, 8s, ...)
+                // BONUS : délai exponentiel (2s, 4s, 8s, ...)
                 if (tentative < maxTentatives)
                 {
                     int delaiSecondes = (int)Math.Pow(2, tentative);

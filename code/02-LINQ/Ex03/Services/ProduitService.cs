@@ -43,7 +43,7 @@ namespace Ex03_ProjectionSelect.Services
                     $"{p.Nom} - CHF {(p.PrixHT * (decimal)(1 + p.TauxTVA / 100)):0.00} (Stock: {p.Stock})");
         }
 
-        // ⭐ Bonus : projection vers type anonyme
+        // BONUS : projection vers type anonyme
         public IEnumerable<object> ObtenirNomEtPrixTtcAnonyme()
         {
             return _produits

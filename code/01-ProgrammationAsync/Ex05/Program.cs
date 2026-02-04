@@ -39,7 +39,7 @@ namespace Ex05
             view.AfficherProduit(await repository.ObtenirProduitParIdAsync(1)!);
             Console.WriteLine();
 
-            // ⭐ BONUS : Recherche
+            // BONUS : Recherche
             string keySearch = "s";
             Console.WriteLine($"Recherche par {keySearch} :");
             var recherches = await repository.RechercherProduitsAsync(keySearch);

@@ -20,19 +20,19 @@ namespace Ex03
             var service = new ProduitService(produits);
             var view = new ProduitView();
 
-            // 1️⃣ Noms en majuscules
+            // Noms en majuscules
             view.AfficherNoms(service.ObtenirNomsEnMajuscules());
 
-            // 2️⃣ Produits avec prix TTC
+            // Produits avec prix TTC
             view.AfficherProduitsFormates(
                 service.ObtenirProduitsAvecPrixTTC());
 
-            // 3️⃣ Descriptions formatées
+            // Descriptions formatées
             Console.WriteLine("\n--- Descriptions ---");
             foreach (var desc in service.ObtenirDescriptionsFormatees())
                 Console.WriteLine(desc);
 
-            // ⭐ Bonus
+            // BONUS
             Console.WriteLine("\n--- Projection anonyme ---");
             foreach (var p in service.ObtenirNomEtPrixTtcAnonyme())
                 Console.WriteLine(p);

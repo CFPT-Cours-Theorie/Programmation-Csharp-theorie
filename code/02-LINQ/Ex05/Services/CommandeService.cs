@@ -16,14 +16,14 @@ namespace Ex05_RegroupementGroupBy.Services
             this.commandes = commandes;
         }
 
-        // 1️⃣ Groupement simple
+        // Groupement simple
         public IEnumerable<IGrouping<string, Commande>> GrouperParClient()
         {
             return commandes
                 .GroupBy(c => c.Client);
         }
 
-        // 2️⃣ GroupBy + Select (projection)
+        // GroupBy + Select (projection)
         public IEnumerable<ResumeParClient> ObtenirResumeParClient()
         {
             return commandes
@@ -36,14 +36,14 @@ namespace Ex05_RegroupementGroupBy.Services
                 });
         }
 
-        // 3️⃣ Groupement par mois
+        // Groupement par mois
         public IEnumerable<IGrouping<int, Commande>> GrouperParMois()
         {
             return commandes
                 .GroupBy(c => c.DateCommande.Month);
         }
 
-        // ⭐ Bonus
+        // BONUS
         public string ObtenirClientAvecLePlusDeCommandes()
         {
             return commandes

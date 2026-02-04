@@ -63,7 +63,7 @@ namespace Ex04.Services
                 .Sum(v => v.Montant);
         }
 
-        // ⭐ Bonus : meilleur vendeur
+        // BONUS : meilleur vendeur
         public string ObtenirMeilleurVendeur()
         {
             return _ventes

@@ -58,7 +58,7 @@ namespace Ex04.Services
             return (await Task.WhenAll(tasks)).ToList();
         }
 
-        // ⭐ BONUS : affichage au fil de l’eau
+        // BONUS : affichage au fil de l’eau
         public async Task TelechargerAvecRetourProgressifAsync(
             List<string> urls,
             Action<ResultatTelechargement> onResultat)

@@ -48,7 +48,7 @@ namespace Ex05_SimulBDD.Services
             }
         }
 
-        // ⭐ BONUS
+        // BONUS
         public async Task<List<Produit>> RechercherProduitsAsync(string motCle)
         {
             await Task.Delay(DelaiSimulationMs);

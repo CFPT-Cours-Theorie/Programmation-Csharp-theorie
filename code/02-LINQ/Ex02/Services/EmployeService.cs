@@ -45,7 +45,7 @@ namespace Ex02.Services
                 .OrderBy(e => e.DateEmbauche);
         }
 
-        // ⭐ Bonus : Département (A-Z), puis Salaire (desc)
+        // BONUS : Département (A-Z), puis Salaire (desc)
         public IOrderedEnumerable<Employe> TrierParDepartementPuisSalaireDecroissant()
         {
             return _employes

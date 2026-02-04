@@ -13,7 +13,7 @@ namespace Ex08_ProgressionIProgress.Models
         public int EtapesTotal { get; set; }
         public TimeSpan TempsEcoule { get; set; }
 
-        // ⭐ BONUS
+        // BONUS
         public TimeSpan TempsRestantEstime { get; set; }
     }
 }

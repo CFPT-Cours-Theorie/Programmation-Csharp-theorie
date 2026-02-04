@@ -24,7 +24,7 @@ namespace Ex08_ProgressionIProgress.Services
                 int pourcentage = (int)(i / (double)nombreEtapes * 100);
                 TimeSpan tempsEcoule = stopwatch.Elapsed;
 
-                // ⭐ BONUS : estimation du temps restant
+                // BONUS : estimation du temps restant
                 TimeSpan tempsRestant = TimeSpan.Zero;
                 if (i > 0)
                 {

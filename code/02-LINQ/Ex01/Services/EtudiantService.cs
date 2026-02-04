@@ -40,7 +40,7 @@ namespace Ex01.Services
                 .ToList();
         }
 
-        // ⭐ Bonus : nom commence par une lettre
+        // BONUS : nom commence par une lettre
         public List<Etudiant> ObtenirEtudiantsDontNomCommencePar(char lettre)
         {
             return _etudiants

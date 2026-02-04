@@ -20,15 +20,15 @@ namespace Ex05
             var service = new CommandeService(commandes);
             var view = new CommandeView();
 
-            // 1️⃣ Groupes par client
+            // Groupes par client
             var groupesClient = service.GrouperParClient();
             view.AfficherGroupesParClient(groupesClient);
 
-            // 2️⃣ Résumé par client
+            // Résumé par client
             var resumes = service.ObtenirResumeParClient();
             view.AfficherResumes(resumes);
 
-            // 3️⃣ Chiffre d'affaires par mois
+            // Chiffre d'affaires par mois
             Console.WriteLine("\n--- Chiffre d'affaires mensuel ---");
             foreach (var groupe in service.GrouperParMois())
             {
@@ -36,7 +36,7 @@ namespace Ex05
                 Console.WriteLine($"Mois {groupe.Key} : CHF {total:0.00}");
             }
 
-            // ⭐ Bonus
+            // BONUS
             Console.WriteLine(
                 $"\nClient avec le plus de commandes : {service.ObtenirClientAvecLePlusDeCommandes()}");
         }

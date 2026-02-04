@@ -78,7 +78,7 @@ namespace Ex06
                 "Toutes les compétences Alice + Bob");
 
             var meilleur = service.TrouverMeilleurCandidatPourOffre(candidats, offre);
-            Console.WriteLine($"\n⭐ Meilleur candidat pour l'offre : {meilleur.Nom}");
+            Console.WriteLine($"\nMeilleur candidat pour l'offre : {meilleur.Nom}");
         }
     }
 }

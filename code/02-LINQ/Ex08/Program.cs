@@ -53,7 +53,7 @@ namespace Ex08
             var resultat = service.ValiderListeTaches();
             view.AfficherResultatValidation(resultat);
 
-            // ⭐ Bonus
+            // BONUS
             Console.WriteLine(
                 service.ToutesTachesUrgentesTerminees()
                     ? "\nToutes les tâches urgentes sont terminées"
