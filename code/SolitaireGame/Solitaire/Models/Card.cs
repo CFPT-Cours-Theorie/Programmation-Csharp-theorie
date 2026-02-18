@@ -1,4 +1,5 @@
 ﻿using Solitaire.Enums;
+using Solitaire.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,12 @@ namespace Solitaire.Models
         /// <summary>
         /// Couleur de la carte
         /// </summary>
-        public CarteColor Color { get; private set; }
+        public CarteColor CardColor { get; private set; }
+
+        /// <summary>
+        /// Dit si la carte peut-être bougé
+        /// </summary>
+        public bool IsMovable { get; set; }
 
         /// <summary>
         /// Categorie de la carte
@@ -57,6 +63,21 @@ namespace Solitaire.Models
         }
 
         /// <summary>
+        /// Echelle d'affichage des cartes
+        /// </summary>
+        public const int Scale = 2;
+        public Size Size
+        {
+            get
+            {
+                Bitmap ressource = Ressource;
+                return new Size(ressource.Width * Scale, ressource.Height * Scale);
+            }
+        }
+        public Point Position { get => picBx.Location; }
+        public PictureBox picBx { get; private set; }
+
+        /// <summary>
         /// Constructeur de la classe....
         /// </summary>
         /// <param name="value">Valeur de la carte</param>
@@ -65,9 +86,23 @@ namespace Solitaire.Models
         {
             Value = value;
             Categorie = categorie;
-            Color = (Categorie == CarteCategorie.Clubs || Categorie == CarteCategorie.Spades)
+            CardColor = (Categorie == CarteCategorie.Clubs || Categorie == CarteCategorie.Spades)
                 ? CarteColor.Black
                 : CarteColor.Red;
+            IsMovable = false;
+        }
+
+        public PictureBox CreatePictureBox(Point position)
+        {
+            picBx = new PictureBox()
+            {
+                Size = Size,
+                Location = position,
+                Image = Ressource,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                BackColor = Color.Transparent
+            };
+            return picBx;
         }
     }
 }
