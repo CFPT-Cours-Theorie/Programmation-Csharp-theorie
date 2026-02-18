@@ -67,14 +67,14 @@ namespace Solitaire.Controllers
         {
             const int NB_COLS = 7;
             Point tmpPosition = new Point(0, 0);
-            Point SPACING = new Point(view.Dimensions.Width / (NB_COLS + 1), -8);
+            Point SPACING = new Point(50, 2);
             Size lastSize = new Size();
 
-            // Afficher toutes les cartes
-            tmpPosition.X = SPACING.X / 3;
+            // Afficher les colonnes des cartes
+            tmpPosition.X = Tools.GetNbrFrmPrct(3, view.Width);
             for (int col = 0; col <= NB_COLS; col++)
             {
-                tmpPosition.Y = 30;
+                tmpPosition.Y = Tools.GetNbrFrmPrct(5, view.Height);
 
                 for (int i = 0; i < col; i++)
                 {
@@ -90,14 +90,36 @@ namespace Solitaire.Controllers
             }
             tmpPosition.X -= SPACING.X;
 
+            // Afficher la pioche
+            MyImage pioche = new MyImage("Deck");
+            view.Controls.Add(pioche.CreatePictureBox(
+                new Point(
+                    Tools.GetNbrFrmPrct(80, view.Width),
+                    Tools.GetNbrFrmPrct(15, view.Height)
+                )
+            ));
+
             // Update
             UpdateMovableCardState();
         }
 
         private void UpdateMovableCardState()
         {
-            Deck.Select(c => c.IsMovable = false);
-            // List<Card> board
+            foreach (var c in Deck)
+                c.IsMovable = false;
+
+            var cardsByColumn = board
+                .GroupBy(c => c.Position.X)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var column in cardsByColumn.Values)
+            {
+                if (column.Count == 0)
+                    continue;
+
+                Card lowerCard = column.OrderBy(c => c.Position.Y).First();
+                lowerCard.IsMovable = true;
+            }
         }
     }
 }

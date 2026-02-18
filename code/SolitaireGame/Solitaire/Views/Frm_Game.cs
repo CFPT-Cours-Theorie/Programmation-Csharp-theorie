@@ -6,9 +6,6 @@ namespace Solitaire
     {
         private GameRound gameRound;
         
-        public Rectangle Dimensions => new Rectangle(Width, Height, Location.X, Location.Y);
-
-
         /// <summary>
         /// Constructeur de la classe...
         /// </summary>

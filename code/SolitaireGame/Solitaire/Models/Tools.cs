@@ -54,5 +54,16 @@ namespace Solitaire.Models
         {
             return string.Concat(Enumerable.Repeat(text, (int)n));
         }
+
+        /// <summary>
+        /// Méthode qui retourne le nombre précis en fonction de son pourcentage
+        /// </summary>
+        /// <param name="percentage">Pourcentage voulu</param>
+        /// <param name="total">Réel total du pourcentage</param>
+        /// <returns>nombre</returns>
+        public static int GetNbrFrmPrct(int percentage, int total)
+        {
+            return (int)((percentage / 100.0) * total);
+        }
     }
 }

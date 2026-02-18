@@ -12,7 +12,7 @@ namespace Solitaire.Models
     /// <summary>
     /// Classe représentant les cartes de jeu
     /// </summary>
-    internal class Card
+    internal class Card : MyImage
     {
         private int _value;
 
@@ -37,52 +37,16 @@ namespace Solitaire.Models
         public CarteColor CardColor { get; private set; }
 
         /// <summary>
-        /// Dit si la carte peut-être bougé
-        /// </summary>
-        public bool IsMovable { get; set; }
-
-        /// <summary>
         /// Categorie de la carte
         /// </summary>
         public CarteCategorie Categorie { get; private set; }
-
-        /// <summary>
-        /// Ressource image de la carte
-        /// </summary>
-        public Bitmap Ressource
-        {
-            get
-            {
-                string resourceName = $"{Categorie}_{Value}";
-                var obj = Properties.Resources.ResourceManager.GetObject(resourceName);
-
-                if (obj is Bitmap bitmap)
-                    return bitmap;
-                throw new Exception($"Ressource {resourceName} introuvable");
-            }
-        }
-
-        /// <summary>
-        /// Echelle d'affichage des cartes
-        /// </summary>
-        public const int Scale = 2;
-        public Size Size
-        {
-            get
-            {
-                Bitmap ressource = Ressource;
-                return new Size(ressource.Width * Scale, ressource.Height * Scale);
-            }
-        }
-        public Point Position { get => picBx.Location; }
-        public PictureBox picBx { get; private set; }
 
         /// <summary>
         /// Constructeur de la classe....
         /// </summary>
         /// <param name="value">Valeur de la carte</param>
         /// <param name="categorie">CarteCategorie de la carte</param>
-        public Card(int value, CarteCategorie categorie)
+        public Card(int value, CarteCategorie categorie) : base("")
         {
             Value = value;
             Categorie = categorie;
@@ -90,19 +54,7 @@ namespace Solitaire.Models
                 ? CarteColor.Black
                 : CarteColor.Red;
             IsMovable = false;
-        }
-
-        public PictureBox CreatePictureBox(Point position)
-        {
-            picBx = new PictureBox()
-            {
-                Size = Size,
-                Location = position,
-                Image = Ressource,
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                BackColor = Color.Transparent
-            };
-            return picBx;
+            ResourceName = $"{Categorie}_{Value}";
         }
     }
 }
