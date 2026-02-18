@@ -17,7 +17,7 @@ namespace Solitaire.Models
         /// <returns>Un nombre entier aléatoire</returns>
         public static int GetRandomInt(int min, int max)
         {
-            return new Random().Next(min, max + 1);
+            return Random.Shared.Next(min, max + 1);
         }
 
         /// <summary>

@@ -5,6 +5,9 @@ namespace Solitaire
     public partial class Frm_Game : Form
     {
         private GameRound gameRound;
+        
+        public Rectangle Dimensions => new Rectangle(Width, Height, Location.X, Location.Y);
+
 
         /// <summary>
         /// Constructeur de la classe...
@@ -12,7 +15,7 @@ namespace Solitaire
         public Frm_Game()
         {
             InitializeComponent();
-            gameRound = new GameRound();
+            gameRound = new GameRound(this);
         }
 
         /// <summary>
