@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,6 +36,22 @@ namespace Solitaire.Models
         public CarteCategorie Categorie { get; private set; }
 
         /// <summary>
+        /// Ressource image de la carte
+        /// </summary>
+        public Bitmap Ressource
+        {
+            get
+            {
+                string resourceName = $"{Categorie}_{Value}";
+
+                PropertyInfo prop = typeof(Properties.Resources).GetProperty(resourceName, BindingFlags.Static | BindingFlags.Public);
+
+                return prop?.GetValue(null) as Bitmap
+                    ?? throw new Exception($"Ressource {resourceName} introuvable");
+            }
+        }
+
+        /// <summary>
         /// Constructeur de la classe....
         /// </summary>
         /// <param name="value">Valeur de la carte</param>
@@ -43,15 +60,6 @@ namespace Solitaire.Models
         {
             Value = value;
             Categorie = categorie;
-        }
-
-        /// <summary>
-        /// Retourne le chemin de l'image de la carte
-        /// </summary>
-        /// <returns>Le nom du fichier image</returns>
-        public string GetFilePath()
-        {
-            return $"{Tools.GetRessourcePath()}{Categorie.ToString()}_{Value}.png"; ;
         }
     }
 }
