@@ -31,7 +31,12 @@ namespace Solitaire.Models
         public const int MaxValue = 13;
 
         /// <summary>
-        /// CarteCategorie de la carte
+        /// Couleur de la carte
+        /// </summary>
+        public CarteColor Color { get; private set; }
+
+        /// <summary>
+        /// Categorie de la carte
         /// </summary>
         public CarteCategorie Categorie { get; private set; }
 
@@ -43,11 +48,11 @@ namespace Solitaire.Models
             get
             {
                 string resourceName = $"{Categorie}_{Value}";
+                var obj = Properties.Resources.ResourceManager.GetObject(resourceName);
 
-                PropertyInfo prop = typeof(Properties.Resources).GetProperty(resourceName, BindingFlags.Static | BindingFlags.Public);
-
-                return prop?.GetValue(null) as Bitmap
-                    ?? throw new Exception($"Ressource {resourceName} introuvable");
+                if (obj is Bitmap bitmap)
+                    return bitmap;
+                throw new Exception($"Ressource {resourceName} introuvable");
             }
         }
 
@@ -60,6 +65,9 @@ namespace Solitaire.Models
         {
             Value = value;
             Categorie = categorie;
+            Color = (Categorie == CarteCategorie.Clubs || Categorie == CarteCategorie.Spades)
+                ? CarteColor.Black
+                : CarteColor.Red;
         }
     }
 }
