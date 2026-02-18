@@ -1,6 +1,6 @@
 ﻿namespace Solitaire
 {
-    partial class Form1
+    partial class Frm_Game
     {
         /// <summary>
         ///  Required designer variable.
@@ -41,14 +41,18 @@
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             // 
-            // Form1
+            // Frm_Game
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(pictureBox1);
-            Name = "Form1";
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            Name = "Frm_Game";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Form1";
+            Load += Frm_Game_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
