@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Solitaire.Models
 {
+    /// <summary>
+    /// Classe statique de fonctions
+    /// </summary>
     static class Tools
     {
         /// <summary>

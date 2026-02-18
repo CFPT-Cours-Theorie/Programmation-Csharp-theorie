@@ -20,6 +20,10 @@ namespace Solitaire.Models
         /// Echelle d'affichage des cartes
         /// </summary>
         public const int Scale = 2;
+
+        /// <summary>
+        /// Taille de la carte
+        /// </summary>
         public Size Size
         {
             get

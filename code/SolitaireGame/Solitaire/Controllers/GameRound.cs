@@ -20,8 +20,6 @@ namespace Solitaire.Controllers
         private List<Card> trash;
         private List<Card> Deck { get => board.Concat(pick).Concat(trash).ToList(); }
         private ImmutableList<CarteCategorie> categories;
-
-
         private Frm_Game view;
 
         /// <summary>
