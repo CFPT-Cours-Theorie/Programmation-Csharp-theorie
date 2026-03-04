@@ -24,7 +24,7 @@ namespace Solitaire
         {
             // Config
             Text = "Jeu du solitaire";
-            SetWindowSize(1080, 2.0 / 3.0);
+            SetWindowSize(690, 4.0 / 5.0);
             BackgroundImage = Properties.Resources.Background_Green_Felt;
 
             // Play

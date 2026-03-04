@@ -9,7 +9,7 @@ namespace Solitaire.Enums
     /// <summary>
     /// Enumération des différentes catégories de cartes
     /// </summary>
-    internal enum CarteCategorie
+    internal enum CardCategorie
     {
         /// <summary>
         /// Groupe de trèfles

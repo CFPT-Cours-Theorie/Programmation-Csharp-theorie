@@ -28,7 +28,7 @@ namespace Solitaire.Models
         {
             get
             {
-                Bitmap ressource = Ressource;
+                Bitmap ressource = Resource;
                 return new Size(ressource.Width * Scale, ressource.Height * Scale);
             }
         }
@@ -46,12 +46,12 @@ namespace Solitaire.Models
         /// <summary>
         /// Picture Box de l'élement
         /// </summary>
-        public PictureBox PictureBox { get; protected set; }
+        public PictureBox PictureBox { get; set; } // protected set; }
 
         /// <summary>
-        /// Ressource image de la carte
+        /// Resource image de la carte
         /// </summary>
-        public Bitmap Ressource
+        public Bitmap Resource
         {
             get
             {
@@ -81,16 +81,30 @@ namespace Solitaire.Models
         {
             if (PictureBox != null)
                 return PictureBox;
-                
+
             PictureBox = new PictureBox()
             {
                 Size = Size,
                 Location = position,
-                Image = Ressource,
+                Image = Resource,
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 BackColor = Color.Transparent
             };
             return PictureBox;
+        }
+
+        /// <summary>
+        /// Remplace l'image de la picture box
+        /// </summary>
+        /// <param name="image">La nouvelle image de la picture box qui va remplacer</param>
+        public void ReplacePictureBoxImage(Bitmap image)
+        {
+            PictureBox.Image = image;
+        }
+
+        public override string ToString()
+        {
+            return ResourceName;
         }
     }
 }

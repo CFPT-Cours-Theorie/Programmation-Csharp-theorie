@@ -18,14 +18,11 @@ namespace Solitaire.Controllers
     /// </summary>
     internal class GameRound
     {
-        private List<Card> board;
-        private List<Card> pick;
-        private List<Card> trash;
-        private List<Card> Deck { get => board.Concat(pick).Concat(trash).ToList(); }
-        private ImmutableList<CarteCategorie> categories;
+        private List<Card> deck;
+        private ImmutableList<CardCategorie> categories;
         private Frm_Game view;
-        private ImageClick pioche;
-        private List<MyImage> foundations;
+        private List<MyImage> pickFoundations;
+        private bool pickCanClick;
 
         /// <summary>
         /// Constructeur de la classe...
@@ -33,26 +30,23 @@ namespace Solitaire.Controllers
         public GameRound(Frm_Game vue)
         {
             view = vue;
+            deck = new List<Card>();
 
-            // Clear
-            board = new List<Card>();
-            pick = new List<Card>();
-            trash = new List<Card>();
-
-            foundations = new List<MyImage>();
+            // Pick & Foundations
+            pickFoundations = new List<MyImage>()
+            {
+                new MyImage("Deck"),
+                new MyImage("Background_Green_Slot")
+            };
             for (int i = 0; i < 4; i++)
-                foundations.Add(new MyImage("Background_Green_Slot"));
+                pickFoundations.Add(new MyImage("Background_Green_Slot"));
 
             // autre
-            pioche = new ImageClick("Deck", new Action(() =>
-            {
-                throw new NotImplementedException();
-            }));
             categories = ImmutableList.Create(
-               CarteCategorie.Clubs,
-               CarteCategorie.Diamonds,
-               CarteCategorie.Hearts,
-               CarteCategorie.Spades
+               CardCategorie.Clubs,
+               CardCategorie.Diamonds,
+               CardCategorie.Hearts,
+               CardCategorie.Spades
            );
         }
 
@@ -62,24 +56,23 @@ namespace Solitaire.Controllers
         /// <returns>Liste de <see cref="Card"/> générée</returns>
         public List<Card> GenerateDeck()
         {
-            board.Clear();
-            pick.Clear();
-            trash.Clear();
+            deck.Clear();
 
-            // Générer les cartes du deck
+            // Générer les cartes du pick
             for (int i = 0; i < categories.Count; i++)
                 for (int value = Card.MinValue; value <= Card.MaxValue; value++)
-                    pick.Add(new Card(value, categories[i]));
+                    deck.Add(new Card(value, categories[i], CardLayout.Pick_Hided));
 
             // Mélanger
-            Random.Shared.Shuffle(CollectionsMarshal.AsSpan(pick));
-            return pick;
+            deck = Tools.ListShuffle(deck);
+            return deck;
         }
 
         public void Start()
         {
             // Init
             GenerateDeck();
+            pickCanClick = true;
             Draw();
 
             // Update
@@ -90,56 +83,56 @@ namespace Solitaire.Controllers
         {
             // Init
             const int NB_COLS = 7;
-            Point start = new Point(10, 50);
-            Point spacing = new Point(100, 30);
+            Point start = new Point(55, 40);
+            Size spacing = new Size(30, 30);
+            Size unit = new Size(
+                pickFoundations[0].Size.Width + spacing.Width,
+                pickFoundations[0].Size.Height + spacing.Height
+            );
+            List<Card> pickHided = deck.Where(c => c.Layout == CardLayout.Pick_Hided).ToList();
+
+            // Afficher la pioche/fausse
+            for (int i = 0; i < pickFoundations.Count; i++)
+            {
+                MyImage img = pickFoundations[i];
+                int colIndex = (i >= 2) ? i + 1 : i;
+                view.Controls.Add(img.CreatePictureBox(new Point(
+                    start.X + (colIndex * unit.Width),
+                    start.Y
+                )));
+            }
+
+            // La pioche
+            MyImage pick = pickFoundations[0];
+            pick.PictureBox.Click += async (s, e) =>
+            {
+                Pioche();
+            };
 
             // Afficher les colonnes des cartes
+            start.X -= unit.Width;
+            start.Y += unit.Height - spacing.Height;
             for (int col = NB_COLS; col > 0; col--)
             {
                 for (int row = col; row > 0; row--)
                 {
-                    if (pick.Count == 0) break;
-                    Card card = pick.Last();
+                    if (pickHided.Count == 0) break;
+                    Card card = pickHided.Last();
                     bool isLastCardOfColumn = !(col != row);
 
-                    if (!isLastCardOfColumn)
-                        card.Flip();
-
                     PictureBox picbx = card.CreatePictureBox(new Point(
-                        start.X + col * spacing.X,
-                        start.Y + row * spacing.Y
+                        start.X + (col * unit.Width),
+                        start.Y + (row * spacing.Height)
                     ));
+
+                    if (row < col) card.Flip();
+                    else picbx.Click += (s, e) => card.OnClick();
+
                     view.Controls.Add(picbx);
-
-                    if (isLastCardOfColumn)
-                        picbx.Click += (s, e) => card.OnClick();
-
-                    board.Add(card);
-                    pick.Remove(card);
+                    card.Layout = CardLayout.Board;
+                    card.IndexColumn = NB_COLS - col;
+                    pickHided.Remove(card);
                 }
-            }
-
-            // Afficher la pioche
-            view.Controls.Add(
-                pioche.CreatePictureBox(
-                    new Point(
-                        Tools.GetNbrFrmPrct(80, view.Width),
-                        Tools.GetNbrFrmPrct(15, view.Height)
-                    )
-                )
-            );
-
-            // Afficher la fausse
-            for (int i = 0; i < foundations.Count; i++)
-            {
-                view.Controls.Add(
-                    foundations[i].CreatePictureBox(
-                        new Point(
-                            Tools.GetNbrFrmPrct(80, view.Width),
-                            i * spacing.Y + i * foundations[i].Size.Height + Tools.GetNbrFrmPrct(30, view.Height)
-                        )
-                    )
-                );
             }
         }
 
@@ -148,11 +141,55 @@ namespace Solitaire.Controllers
         /// </summary>
         private void UpdateMovableCardState()
         {
-            foreach (var c in pick)
+            List<Card> pick_hide = deck.Where(c => c.Layout == CardLayout.Pick_Hided).ToList();
+            foreach (Card c in pick_hide)
                 c.IsMovable = false;
 
-            foreach (var c in board)
+            List<Card> board = deck.Where(c => c.Layout == CardLayout.Board).ToList();
+            foreach (Card c in board)
                 c.IsMovable = !c.IsTurned;
+        }
+
+        private async void Pioche()
+        {
+            if (!pickCanClick) return;
+
+            // Init
+            pickCanClick = false;
+            MyImage pick = pickFoundations[0];
+            MyImage trash = pickFoundations[1];
+            List<Card> cardsHided = deck.Where(c => c.Layout == CardLayout.Pick_Hided).ToList();
+
+            // Traitement
+            if (cardsHided.Count > 0)
+            {
+                // On tire une carte
+                Card newCard = cardsHided.Last();
+                newCard.Layout = CardLayout.Pick_Showed;
+                trash.ReplacePictureBoxImage(newCard.Resource);
+
+                if (cardsHided.Count == 1)
+                    pick.ReplacePictureBoxImage(Properties.Resources.Card_Back);
+            }
+            else
+            {
+                // Remélanger
+                pick.ReplacePictureBoxImage(Properties.Resources.Background_Green_Slot);
+                List<Card> cardsToPick = deck.Where(c => c.Layout == CardLayout.Pick_Showed).ToList();
+                cardsToPick.Reverse();
+
+                // Redéfinir l'état des cartes de la pile
+                await Task.Delay((int)(0.75 * 1000.0));
+                foreach (Card card in cardsToPick)
+                    card.Layout = CardLayout.Pick_Hided;
+
+                // Sortie
+                pick.ReplacePictureBoxImage(Properties.Resources.Deck);
+                trash.ReplacePictureBoxImage(Properties.Resources.Background_Green_Slot);
+            }
+
+            // Sortie
+            pickCanClick = true;
         }
     }
 }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -67,6 +69,12 @@ namespace Solitaire.Models
         public static int GetNbrFrmPrct(int percentage, int total)
         {
             return (int)((percentage / 100.0) * total);
+        }
+
+        public static List<Card> ListShuffle(List<Card> list)
+        {
+            Random.Shared.Shuffle(CollectionsMarshal.AsSpan(list));
+            return list;
         }
     }
 }

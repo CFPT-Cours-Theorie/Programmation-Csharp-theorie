@@ -59,12 +59,14 @@ namespace Solitaire.Properties {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Background_Green_Felt {
-            get {
+        internal static System.Drawing.Bitmap Background_Green_Felt
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("Background_Green_Felt", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
@@ -79,7 +81,7 @@ namespace Solitaire.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
         /// </summary>

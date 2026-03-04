@@ -15,6 +15,7 @@ namespace Solitaire.Models
     internal class Card : MyImage
     {
         private int _value;
+        private int _index;
 
         /// <summary>
         /// Représente le nom de la resource d'une carte tournée (face cachée)
@@ -39,12 +40,12 @@ namespace Solitaire.Models
         /// <summary>
         /// Couleur de la carte
         /// </summary>
-        public CarteColor CardColor { get; private set; }
+        public CardColor CardColor { get; private set; }
 
         /// <summary>
         /// Categorie de la carte
         /// </summary>
-        public CarteCategorie Categorie { get; private set; }
+        public CardCategorie Categorie { get; private set; }
 
         /// <summary>
         /// Indique si la carte est tournée (face cachée)
@@ -52,17 +53,55 @@ namespace Solitaire.Models
         public bool IsTurned => ResourceName == TURNED_CARD;
 
         /// <summary>
+        /// Le layout de la carte
+        /// </summary>
+        public CardLayout Layout { get; set; }
+
+        /// <summary>
+        /// index de la colonne dans laquelle se trouve la carte
+        /// (0-6 pour les colonnes du tableau, 7 pour la pioche, 8-11 pour les fondations)
+        /// </summary>
+        public int IndexColumn {
+            get => _index;
+            set
+            {
+                switch (Layout)
+                {
+                    case CardLayout.Board:
+                        _value = Math.Clamp(value, 0, 6);
+                        break;
+
+                    case CardLayout.Pick_Hided:
+                        _value = 7;
+                        break;
+
+                    case CardLayout.Pick_Showed:
+                        _value = 8;
+                        break;
+
+                    case CardLayout.Foundations:
+                        _value = Math.Clamp(value, 9, 12);
+                        break;
+
+                    default:
+                        throw new Exception($"Le layout n'est pas défini");
+                }
+            }
+        }
+
+        /// <summary>
         /// Constructeur de la classe....
         /// </summary>
         /// <param name="value">Valeur de la carte</param>
-        /// <param name="categorie">CarteCategorie de la carte</param>
-        public Card(int value, CarteCategorie categorie) : base("")
+        /// <param name="categorie">CardCategorie de la carte</param>
+        public Card(int value, CardCategorie categorie, CardLayout layout) : base("")
         {
             Value = value;
             Categorie = categorie;
-            CardColor = (Categorie == CarteCategorie.Clubs || Categorie == CarteCategorie.Spades)
-                ? CarteColor.Black
-                : CarteColor.Red;
+            Layout = layout;
+            CardColor = (Categorie == CardCategorie.Clubs || Categorie == CardCategorie.Spades)
+                ? CardColor.Black
+                : CardColor.Red;
             IsMovable = false;
             Flip();
             Flip();
@@ -82,7 +121,7 @@ namespace Solitaire.Models
 
             // Update UI - re-render
             if (PictureBox != null)
-                PictureBox.Image = Ressource;
+                PictureBox.Image = Resource;
         }
 
         /// <summary>
