@@ -3,7 +3,10 @@ using Solitaire.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Configuration;
+using System.Drawing;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,24 +24,36 @@ namespace Solitaire.Controllers
         private List<Card> Deck { get => board.Concat(pick).Concat(trash).ToList(); }
         private ImmutableList<CarteCategorie> categories;
         private Frm_Game view;
+        private ImageClick pioche;
+        private List<MyImage> foundations;
 
         /// <summary>
         /// Constructeur de la classe...
         /// </summary>
         public GameRound(Frm_Game vue)
         {
+            view = vue;
+
+            // Clear
             board = new List<Card>();
             pick = new List<Card>();
             trash = new List<Card>();
-            view = vue;
 
+            foundations = new List<MyImage>();
+            for (int i = 0; i < 4; i++)
+                foundations.Add(new MyImage("Background_Green_Slot"));
+
+            // autre
+            pioche = new ImageClick("Deck", new Action(() =>
+            {
+                throw new NotImplementedException();
+            }));
             categories = ImmutableList.Create(
                CarteCategorie.Clubs,
                CarteCategorie.Diamonds,
                CarteCategorie.Hearts,
                CarteCategorie.Spades
            );
-            GenerateDeck();
         }
 
         /// <summary>
@@ -63,42 +78,63 @@ namespace Solitaire.Controllers
 
         public void Start()
         {
+            // Init
+            GenerateDeck();
+            Draw();
+
+            // Update
+            UpdateMovableCardState();
+        }
+
+        private void Draw()
+        {
+            // Init
             const int NB_COLS = 7;
-            Point tmpPosition = new Point(0, 0);
-            Point SPACING = new Point(50, 2);
-            Size lastSize = new Size();
+            Point start = new Point(10, 50);
+            Point spacing = new Point(100, 30);
 
             // Afficher les colonnes des cartes
-            tmpPosition.X = Tools.GetNbrFrmPrct(3, view.Width);
-            for (int col = 0; col <= NB_COLS; col++)
+            for (int col = NB_COLS; col > 0; col--)
             {
-                tmpPosition.Y = Tools.GetNbrFrmPrct(5, view.Height);
-
-                for (int i = 0; i < col; i++)
+                for (int row = col; row > 0; row--)
                 {
-                    Card card = pick[col + i];
-                    lastSize = card.Size;
-                    view.Controls.Add(card.CreatePictureBox(tmpPosition));
-                    tmpPosition.Y += lastSize.Height + SPACING.Y;
+                    Card card = pick[col + row];
+
+                    if (col != row)
+                        card.Flip();
+
+                    view.Controls.Add(card.CreatePictureBox(new Point(
+                        start.X + col * spacing.X,
+                        start.Y + row * spacing.Y
+                    )));
 
                     board.Add(card);
                     pick.Remove(card);
                 }
-                tmpPosition.X += lastSize.Width + SPACING.X;
             }
-            tmpPosition.X -= SPACING.X;
 
             // Afficher la pioche
-            MyImage pioche = new MyImage("Deck");
-            view.Controls.Add(pioche.CreatePictureBox(
-                new Point(
-                    Tools.GetNbrFrmPrct(80, view.Width),
-                    Tools.GetNbrFrmPrct(15, view.Height)
+            view.Controls.Add(
+                pioche.CreatePictureBox(
+                    new Point(
+                        Tools.GetNbrFrmPrct(80, view.Width),
+                        Tools.GetNbrFrmPrct(15, view.Height)
+                    )
                 )
-            ));
+            );
 
-            // Update
-            UpdateMovableCardState();
+            // Afficher la fausse
+            for (int i = 0; i < foundations.Count; i++)
+            {
+                view.Controls.Add(
+                    foundations[i].CreatePictureBox(
+                        new Point(
+                            Tools.GetNbrFrmPrct(80, view.Width),
+                            i * spacing.Y + i * foundations[i].Size.Height + Tools.GetNbrFrmPrct(30, view.Height)
+                        )
+                    )
+                );
+            }
         }
 
         private void UpdateMovableCardState()

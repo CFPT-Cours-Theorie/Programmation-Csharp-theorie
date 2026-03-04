@@ -66,19 +66,22 @@ namespace Solitaire.Models
         /// <summary>
         /// Constructeur de la classe...
         /// </summary>
-        /// <param name="name">Nom de l'image</param>
-        public MyImage(string name)
+        /// <param resourceName="resourceName">Nom de l'image</param>
+        public MyImage(string resourceName)
         {
-            ResourceName = name;
+            ResourceName = resourceName;
         }
 
         /// <summary>
         /// Créer la picture box
         /// </summary>
-        /// <param name="position"></param>
+        /// <param resourceName="position"></param>
         /// <returns>La picture box</returns>
         public PictureBox CreatePictureBox(Point position)
         {
+            if (PictureBox != null)
+                return PictureBox;
+                
             PictureBox = new PictureBox()
             {
                 Size = Size,

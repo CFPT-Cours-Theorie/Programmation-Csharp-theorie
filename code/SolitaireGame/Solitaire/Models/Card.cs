@@ -17,6 +17,11 @@ namespace Solitaire.Models
         private int _value;
 
         /// <summary>
+        /// Représente le nom de la resource d'une carte tournée (face cachée)
+        /// </summary>
+        private const string TURNED_CARD = "Card_Back";
+
+        /// <summary>
         /// Valeur de la carte
         /// </summary>
         public int Value { get => _value; private set => _value = Math.Clamp(value, MinValue, MaxValue); }
@@ -42,6 +47,11 @@ namespace Solitaire.Models
         public CarteCategorie Categorie { get; private set; }
 
         /// <summary>
+        /// Indique si la carte est tournée (face cachée)
+        /// </summary>
+        public bool IsTurned => ResourceName == TURNED_CARD;
+
+        /// <summary>
         /// Constructeur de la classe....
         /// </summary>
         /// <param name="value">Valeur de la carte</param>
@@ -54,7 +64,20 @@ namespace Solitaire.Models
                 ? CarteColor.Black
                 : CarteColor.Red;
             IsMovable = false;
-            ResourceName = $"{Categorie}_{Value}";
+            Flip();
+            Flip();
+        }
+
+        /// <summary>
+        /// Retourne la carte (face cachée -> face visible) (face visible -> face cachée)
+        /// </summary>
+        public void Flip()
+        {
+            ResourceName = ResourceName switch
+            {
+                TURNED_CARD => $"{Categorie}_{Value}",
+                _ => TURNED_CARD
+            };
         }
     }
 }
