@@ -1,3 +1,5 @@
+using Solitaire.Views;
+
 namespace Solitaire
 {
     internal static class Program

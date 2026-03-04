@@ -52,6 +52,20 @@ namespace Solitaire.Models
         /// </summary>
         public bool IsTurned => ResourceName == TURNED_CARD;
 
+        private bool _selected;
+        /// <summary>
+        /// Indique si la carte est sélectionné
+        /// </summary>
+        public bool Selected
+        {
+            get => _selected;
+            set
+            {
+                _selected = value;
+                PictureBox?.Invalidate();
+            }
+        }
+
         /// <summary>
         /// Le layout de la carte
         /// </summary>
@@ -61,7 +75,8 @@ namespace Solitaire.Models
         /// index de la colonne dans laquelle se trouve la carte
         /// (0-6 pour les colonnes du tableau, 7 pour la pioche, 8-11 pour les fondations)
         /// </summary>
-        public int IndexColumn {
+        public int IndexColumn
+        {
             get => _index;
             set
             {
@@ -99,6 +114,7 @@ namespace Solitaire.Models
             Value = value;
             Categorie = categorie;
             Layout = layout;
+            Selected = false;
             CardColor = (Categorie == CardCategorie.Clubs || Categorie == CardCategorie.Spades)
                 ? CardColor.Black
                 : CardColor.Red;
@@ -124,12 +140,35 @@ namespace Solitaire.Models
                 PictureBox.Image = Resource;
         }
 
-        /// <summary>
-        /// Fonction appelée lors du click sur la carte
-        /// </summary>
-        public void OnClick()
+        public override PictureBox CreatePictureBox(Point position)
         {
-            Flip();
+            base.CreatePictureBox(position);
+            PictureBox.Paint += OnPaint;
+            return PictureBox;
+        }
+
+        /// <summary>
+        /// Gère la méthode d'affichage du picture box de la carte
+        /// en fonction de si la carte est séléctionnée
+        /// </summary>
+        /// <param name="sender">L'initiateur</param>
+        /// <param name="e">L'evenement</param>
+        private void OnPaint(object sender, PaintEventArgs e)
+        {
+            if (!Selected) return;
+            int borderWidth = 4;
+            Color borderColor = Color.Red;
+
+            using (Pen pen = new Pen(borderColor, borderWidth))
+            {
+                e.Graphics.DrawRectangle(
+                    pen,
+                    borderWidth / 2,
+                    borderWidth / 2,
+                    PictureBox.Width - borderWidth,
+                    PictureBox.Height - borderWidth
+                );
+            }
         }
     }
 }

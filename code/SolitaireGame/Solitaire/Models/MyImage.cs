@@ -46,7 +46,7 @@ namespace Solitaire.Models
         /// <summary>
         /// Picture Box de l'élement
         /// </summary>
-        public PictureBox PictureBox { get; set; } // protected set; }
+        public PictureBox PictureBox { get; protected set; }
 
         /// <summary>
         /// Resource image de la carte
@@ -66,7 +66,7 @@ namespace Solitaire.Models
         /// <summary>
         /// Constructeur de la classe...
         /// </summary>
-        /// <param resourceName="resourceName">Nom de l'image</param>
+        /// <param name="resourceName">Nom de l'image</param>
         public MyImage(string resourceName)
         {
             ResourceName = resourceName;
@@ -75,9 +75,9 @@ namespace Solitaire.Models
         /// <summary>
         /// Créer la picture box
         /// </summary>
-        /// <param resourceName="position"></param>
+        /// <param name="position">La position de la pic box</param>
         /// <returns>La picture box</returns>
-        public PictureBox CreatePictureBox(Point position)
+        public virtual PictureBox CreatePictureBox(Point position)
         {
             if (PictureBox != null)
                 return PictureBox;

@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Drawing;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace Solitaire.Controllers
         private Frm_Game view;
         private List<MyImage> pickFoundations;
         private bool pickCanClick;
+        private List<int> selectedCards;
 
         /// <summary>
         /// Constructeur de la classe...
@@ -31,6 +33,7 @@ namespace Solitaire.Controllers
         {
             view = vue;
             deck = new List<Card>();
+            selectedCards = new List<int>();
 
             // Pick & Foundations
             pickFoundations = new List<MyImage>()
@@ -104,10 +107,7 @@ namespace Solitaire.Controllers
 
             // La pioche
             MyImage pick = pickFoundations[0];
-            pick.PictureBox.Click += async (s, e) =>
-            {
-                Pioche();
-            };
+            pick.PictureBox.Click += async (s, e) => Pioche();
 
             // Afficher les colonnes des cartes
             start.X -= unit.Width;
@@ -126,7 +126,19 @@ namespace Solitaire.Controllers
                     ));
 
                     if (row < col) card.Flip();
-                    else picbx.Click += (s, e) => card.OnClick();
+                    else
+                    {
+                        picbx.Click += (s, e) =>
+                        {
+                            if (!card.IsMovable) return;
+
+                            int index = deck.IndexOf(card);
+                            if (index >= 0)
+                                ToggleAddSelection(index);
+                            else
+                                throw new Exception("Carte introuvable dans le deck !");
+                        };
+                    }
 
                     view.Controls.Add(picbx);
                     card.Layout = CardLayout.Board;
@@ -134,6 +146,20 @@ namespace Solitaire.Controllers
                     pickHided.Remove(card);
                 }
             }
+        }
+
+        private void ToggleAddSelection(int index)
+        {
+            // Désélection
+            if (selectedCards.Count >= 2)
+            {
+                foreach (int i in selectedCards) deck[i].Selected = false;
+                selectedCards.Clear();
+            }
+
+            // Ajouter l'index
+            selectedCards.Add(index);
+            deck[index].Selected = true;
         }
 
         /// <summary>
@@ -150,6 +176,9 @@ namespace Solitaire.Controllers
                 c.IsMovable = !c.IsTurned;
         }
 
+        /// <summary>
+        /// Pioche une carte de la pile
+        /// </summary>
         private async void Pioche()
         {
             if (!pickCanClick) return;
@@ -159,6 +188,7 @@ namespace Solitaire.Controllers
             MyImage pick = pickFoundations[0];
             MyImage trash = pickFoundations[1];
             List<Card> cardsHided = deck.Where(c => c.Layout == CardLayout.Pick_Hided).ToList();
+            List<Card> cardsShowed = deck.Where(c => c.Layout == CardLayout.Pick_Showed).ToList();
 
             // Traitement
             if (cardsHided.Count > 0)
@@ -178,18 +208,24 @@ namespace Solitaire.Controllers
                 List<Card> cardsToPick = deck.Where(c => c.Layout == CardLayout.Pick_Showed).ToList();
                 cardsToPick.Reverse();
 
-                // Redéfinir l'état des cartes de la pile
-                await Task.Delay((int)(0.75 * 1000.0));
-                foreach (Card card in cardsToPick)
-                    card.Layout = CardLayout.Pick_Hided;
+                if (cardsToPick.Count > 1)
+                {
+                    // Redéfinir l'état des cartes de la pile
+                    await Task.Delay((int)(0.75 * 1000.0));
+                    foreach (Card card in cardsToPick)
+                        card.Layout = CardLayout.Pick_Hided;
+
+                    pick.ReplacePictureBoxImage(Properties.Resources.Deck);
+                }
+                else
+                    pickCanClick = true; // technique pour bloquer
 
                 // Sortie
-                pick.ReplacePictureBoxImage(Properties.Resources.Deck);
                 trash.ReplacePictureBoxImage(Properties.Resources.Background_Green_Slot);
             }
 
             // Sortie
-            pickCanClick = true;
+            pickCanClick = !pickCanClick; // ça bloquera ici
         }
     }
 }
