@@ -98,15 +98,21 @@ namespace Solitaire.Controllers
             {
                 for (int row = col; row > 0; row--)
                 {
-                    Card card = pick[col + row];
+                    if (pick.Count == 0) break;
+                    Card card = pick.Last();
+                    bool isLastCardOfColumn = !(col != row);
 
-                    if (col != row)
+                    if (!isLastCardOfColumn)
                         card.Flip();
 
-                    view.Controls.Add(card.CreatePictureBox(new Point(
+                    PictureBox picbx = card.CreatePictureBox(new Point(
                         start.X + col * spacing.X,
                         start.Y + row * spacing.Y
-                    )));
+                    ));
+                    view.Controls.Add(picbx);
+
+                    if (isLastCardOfColumn)
+                        picbx.Click += (s, e) => card.OnClick();
 
                     board.Add(card);
                     pick.Remove(card);
@@ -137,23 +143,16 @@ namespace Solitaire.Controllers
             }
         }
 
+        /// <summary>
+        /// Met à jour l'état de chaque carte pour savoir si elle est déplaçable ou pas
+        /// </summary>
         private void UpdateMovableCardState()
         {
-            foreach (var c in Deck)
+            foreach (var c in pick)
                 c.IsMovable = false;
 
-            var cardsByColumn = board
-                .GroupBy(c => c.Position.X)
-                .ToDictionary(g => g.Key, g => g.ToList());
-
-            foreach (var column in cardsByColumn.Values)
-            {
-                if (column.Count == 0)
-                    continue;
-
-                Card lowerCard = column.OrderBy(c => c.Position.Y).First();
-                lowerCard.IsMovable = true;
-            }
+            foreach (var c in board)
+                c.IsMovable = !c.IsTurned;
         }
     }
 }

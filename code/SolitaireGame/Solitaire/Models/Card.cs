@@ -73,11 +73,24 @@ namespace Solitaire.Models
         /// </summary>
         public void Flip()
         {
+            // Change resource name
             ResourceName = ResourceName switch
             {
                 TURNED_CARD => $"{Categorie}_{Value}",
                 _ => TURNED_CARD
             };
+
+            // Update UI - re-render
+            if (PictureBox != null)
+                PictureBox.Image = Ressource;
+        }
+
+        /// <summary>
+        /// Fonction appelée lors du click sur la carte
+        /// </summary>
+        public void OnClick()
+        {
+            Flip();
         }
     }
 }
