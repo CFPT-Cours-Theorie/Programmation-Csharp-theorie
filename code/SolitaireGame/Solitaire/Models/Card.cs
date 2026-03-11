@@ -92,7 +92,7 @@ namespace Solitaire.Models
             if (PictureBox != null)
                 PictureBox.Image = Resource;
         }
-
+         
         public void AppendChild(Card child, int gap)
         {
             Point newLocation = new Point(

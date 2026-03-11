@@ -67,7 +67,7 @@ namespace Solitaire.Controllers
         {
             deck.Clear();
 
-            // Générer les cartes du pick
+            // Générer les cartes du pick - garantit les 52 cartes
             for (int i = 0; i < categories.Count; i++)
                 for (int value = Card.MinValue; value <= Card.MaxValue; value++)
                     deck.Add(new Card(value, categories[i], CardLayout.Pick_Hided));
@@ -336,7 +336,7 @@ namespace Solitaire.Controllers
                         selectedCard1.Value == selectedCard2.Value - 1 &&
                         selectedCard1.CardColor != selectedCard2.CardColor;
 
-                    if (selectedCard1.Value < selectedCard2.Value)
+                    if (isValidMove)
                     {
                         // Bouger la carte
                         selectedCard2.AppendChild(selectedCard1, spacing_cards.Height);
