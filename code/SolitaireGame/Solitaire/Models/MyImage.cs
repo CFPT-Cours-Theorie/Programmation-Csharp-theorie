@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.ComponentModel.Design.ObjectSelectorEditor;
 
 namespace Solitaire.Models
 {
@@ -63,6 +64,20 @@ namespace Solitaire.Models
             }
         }
 
+        private bool _selected;
+        /// <summary>
+        /// Indique si la carte est sélectionné
+        /// </summary>
+        public bool Selected
+        {
+            get => _selected;
+            set
+            {
+                _selected = value;
+                PictureBox?.Invalidate();
+            }
+        }
+
         /// <summary>
         /// Constructeur de la classe...
         /// </summary>
@@ -70,6 +85,7 @@ namespace Solitaire.Models
         public MyImage(string resourceName)
         {
             ResourceName = resourceName;
+            Selected = false;
         }
 
         /// <summary>
@@ -90,16 +106,42 @@ namespace Solitaire.Models
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 BackColor = Color.Transparent
             };
+            PictureBox.Paint += OnPaint;
             return PictureBox;
+        }
+
+        /// <summary>
+        /// Gère la méthode d'affichage du picture box de la carte
+        /// en fonction de si la carte est séléctionnée
+        /// </summary>
+        /// <param name="sender">L'initiateur</param>
+        /// <param name="e">L'evenement</param>
+        private void OnPaint(object sender, PaintEventArgs e)
+        {
+            if (!Selected) return;
+            int borderWidth = 4;
+            Color borderColor = Color.Red;
+
+            using (Pen pen = new Pen(borderColor, borderWidth))
+            {
+                e.Graphics.DrawRectangle(
+                    pen,
+                    borderWidth / 2,
+                    borderWidth / 2,
+                    PictureBox.Width - borderWidth,
+                    PictureBox.Height - borderWidth
+                );
+            }
         }
 
         /// <summary>
         /// Remplace l'image de la picture box
         /// </summary>
-        /// <param name="image">La nouvelle image de la picture box qui va remplacer</param>
-        public void ReplacePictureBoxImage(Bitmap image)
+        /// <param name="newResourceName">Le nom de la nouvelle image de la picture box va remplacer</param>
+        public void ReplacePictureBoxImage(string newResourceName)
         {
-            PictureBox.Image = image;
+            ResourceName = newResourceName;
+            PictureBox.Image = Resource;
         }
 
         public override string ToString()

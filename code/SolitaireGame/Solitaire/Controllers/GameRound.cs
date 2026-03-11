@@ -24,7 +24,7 @@ namespace Solitaire.Controllers
         private Frm_Game view;
         private List<MyImage> pickFoundations;
         private bool pickCanClick;
-        private List<int> selectedCards;
+        private List<MyImage> selectedCards;
 
         /// <summary>
         /// Constructeur de la classe...
@@ -33,7 +33,7 @@ namespace Solitaire.Controllers
         {
             view = vue;
             deck = new List<Card>();
-            selectedCards = new List<int>();
+            selectedCards = new List<MyImage>();
 
             // Pick & Foundations
             pickFoundations = new List<MyImage>()
@@ -71,6 +71,9 @@ namespace Solitaire.Controllers
             return deck;
         }
 
+        /// <summary>
+        /// Initialise le début de la partie
+        /// </summary>
         public void Start()
         {
             // Init
@@ -82,6 +85,9 @@ namespace Solitaire.Controllers
             UpdateMovableCardState();
         }
 
+        /// <summary>
+        /// Dessine le commencement du jeu
+        /// </summary>
         private void Draw()
         {
             // Init
@@ -107,7 +113,14 @@ namespace Solitaire.Controllers
 
             // La pioche
             MyImage pick = pickFoundations[0];
+            MyImage trash = pickFoundations[1];
             pick.PictureBox.Click += async (s, e) => Pioche();
+            trash.PictureBox.Click += (s, e) =>
+            {
+                MyImage trash = pickFoundations[1];
+                if (trash.ResourceName == "Background_Green_Slot") return;
+                ToggleAddSelection(trash);
+            };
 
             // Afficher les colonnes des cartes
             start.X -= unit.Width;
@@ -125,41 +138,27 @@ namespace Solitaire.Controllers
                         start.Y + (row * spacing.Height)
                     ));
 
-                    if (row < col) card.Flip();
+                    if (row < col)
+                        card.Flip();
                     else
-                    {
-                        picbx.Click += (s, e) =>
-                        {
-                            if (!card.IsMovable) return;
-
-                            int index = deck.IndexOf(card);
-                            if (index >= 0)
-                                ToggleAddSelection(index);
-                            else
-                                throw new Exception("Carte introuvable dans le deck !");
-                        };
-                    }
+                        card.PictureBox.Click += (s, e) => CardOnClick(card);
 
                     view.Controls.Add(picbx);
                     card.Layout = CardLayout.Board;
-                    card.IndexColumn = NB_COLS - col;
                     pickHided.Remove(card);
                 }
             }
         }
 
-        private void ToggleAddSelection(int index)
+        /// <summary>
+        /// Gère le clique de la carte
+        /// </summary>
+        /// <param name="cardClicked">La carte cliqué</param>
+        /// <exception cref="Exception">Erreur indiquant que la carte n'a pas été trouvé</exception>
+        private void CardOnClick(Card cardClicked)
         {
-            // Désélection
-            if (selectedCards.Count >= 2)
-            {
-                foreach (int i in selectedCards) deck[i].Selected = false;
-                selectedCards.Clear();
-            }
-
-            // Ajouter l'index
-            selectedCards.Add(index);
-            deck[index].Selected = true;
+            if (!cardClicked.IsMovable) return;
+            ToggleAddSelection(cardClicked);
         }
 
         /// <summary>
@@ -196,15 +195,15 @@ namespace Solitaire.Controllers
                 // On tire une carte
                 Card newCard = cardsHided.Last();
                 newCard.Layout = CardLayout.Pick_Showed;
-                trash.ReplacePictureBoxImage(newCard.Resource);
+                trash.ReplacePictureBoxImage(newCard.ResourceName);
 
                 if (cardsHided.Count == 1)
-                    pick.ReplacePictureBoxImage(Properties.Resources.Card_Back);
+                    pick.ReplacePictureBoxImage("Card_Back");
             }
             else
             {
                 // Remélanger
-                pick.ReplacePictureBoxImage(Properties.Resources.Background_Green_Slot);
+                pick.ReplacePictureBoxImage("Background_Green_Slot");
                 List<Card> cardsToPick = deck.Where(c => c.Layout == CardLayout.Pick_Showed).ToList();
                 cardsToPick.Reverse();
 
@@ -215,17 +214,51 @@ namespace Solitaire.Controllers
                     foreach (Card card in cardsToPick)
                         card.Layout = CardLayout.Pick_Hided;
 
-                    pick.ReplacePictureBoxImage(Properties.Resources.Deck);
+                    pick.ReplacePictureBoxImage("Deck");
                 }
                 else
                     pickCanClick = true; // technique pour bloquer
 
                 // Sortie
-                trash.ReplacePictureBoxImage(Properties.Resources.Background_Green_Slot);
+                trash.ReplacePictureBoxImage("Background_Green_Slot");
             }
 
             // Sortie
             pickCanClick = !pickCanClick; // ça bloquera ici
+        }
+
+        /// <summary>
+        /// Gère la séléction des cartes
+        /// </summary>
+        /// <param name="card">Carte séléctionnée</param>
+        private void ToggleAddSelection(MyImage card)
+        {
+            int limitSelectedCard = 2;
+            var clearSelect = () =>
+            {
+                foreach (Card c in selectedCards)
+                    c.Selected = false;
+                selectedCards.Clear();
+            };
+
+            // Désélection
+            if (selectedCards.Count >= limitSelectedCard)
+                clearSelect();
+
+
+            // Ajouter la carte
+            if (!selectedCards.Contains(card))
+            {
+                selectedCards.Add(card);
+                card.Selected = true;
+            }
+
+            // Si deux cartes sont séléctionnés
+            if (selectedCards.Count == limitSelectedCard)
+            {
+                // throw new NotImplementedException();
+                // MessageBox.Show("Mettre les règles ici");
+            }
         }
     }
 }
