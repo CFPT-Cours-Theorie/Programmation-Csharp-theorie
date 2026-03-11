@@ -35,9 +35,9 @@ namespace Solitaire.Models
         }
 
         /// <summary>
-        /// Dit si la carte peut-être bougé
+        /// L'état de déplacement
         /// </summary>
-        public bool IsMovable { get; set; }
+        public MovementState StateMovement { get; set; }
 
         /// <summary>
         /// Position de l'élement
@@ -85,6 +85,7 @@ namespace Solitaire.Models
         public MyImage(string resourceName)
         {
             ResourceName = resourceName;
+            StateMovement = new MovementState();
             Selected = false;
         }
 

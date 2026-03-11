@@ -49,7 +49,7 @@ namespace Solitaire.Models
         /// <summary>
         /// Indique si la carte est tournée (face cachée)
         /// </summary>
-        public bool IsTurned => ResourceName == TURNED_CARD;
+        public bool IsTurned => !(ResourceName.Contains(Value.ToString()));
 
         /// <summary>
         /// Le layout de la carte
@@ -70,7 +70,8 @@ namespace Solitaire.Models
             CardColor = (Categorie == CardCategorie.Clubs || Categorie == CardCategorie.Spades)
                 ? CardColor.Black
                 : CardColor.Red;
-            IsMovable = false;
+
+            StateMovement = new MovementState();
             Flip();
             Flip();
         }
@@ -90,6 +91,21 @@ namespace Solitaire.Models
             // Update UI - re-render
             if (PictureBox != null)
                 PictureBox.Image = Resource;
+        }
+
+        public void AppendChild(Card child, int gap)
+        {
+            Point newLocation = new Point(
+                PictureBox.Location.X,
+                PictureBox.Location.Y + gap
+            );
+            child.MoveToFront(newLocation);
+        }
+
+        public void MoveToFront(Point position)
+        {
+            PictureBox.Location = position;
+            PictureBox.BringToFront();
         }
     }
 }

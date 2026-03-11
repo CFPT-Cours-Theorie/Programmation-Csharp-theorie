@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Configuration;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -11,6 +12,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Solitaire.Controllers
 {
@@ -25,6 +27,9 @@ namespace Solitaire.Controllers
         private List<MyImage> pickFoundations;
         private bool pickCanClick;
         private List<MyImage> selectedCards;
+        private Point start_cards;
+        private Size spacing_cards;
+        private List<List<Card>> boardColumns;
 
         /// <summary>
         /// Constructeur de la classe...
@@ -34,6 +39,7 @@ namespace Solitaire.Controllers
             view = vue;
             deck = new List<Card>();
             selectedCards = new List<MyImage>();
+            boardColumns = new List<List<Card>>();
 
             // Pick & Foundations
             pickFoundations = new List<MyImage>()
@@ -81,7 +87,7 @@ namespace Solitaire.Controllers
             pickCanClick = true;
             Draw();
 
-            // Update
+            // Update state
             UpdateMovableCardState();
         }
 
@@ -92,11 +98,11 @@ namespace Solitaire.Controllers
         {
             // Init
             const int NB_COLS = 7;
-            Point start = new Point(55, 40);
-            Size spacing = new Size(30, 30);
+            start_cards = new Point(55, 40);
+            spacing_cards = new Size(30, 30);
             Size unit = new Size(
-                pickFoundations[0].Size.Width + spacing.Width,
-                pickFoundations[0].Size.Height + spacing.Height
+                pickFoundations[0].Size.Width + spacing_cards.Width,
+                pickFoundations[0].Size.Height + spacing_cards.Height
             );
             List<Card> pickHided = deck.Where(c => c.Layout == CardLayout.Pick_Hided).ToList();
 
@@ -104,11 +110,15 @@ namespace Solitaire.Controllers
             for (int i = 0; i < pickFoundations.Count; i++)
             {
                 MyImage img = pickFoundations[i];
+                img.StateMovement.Movable = false;
+
                 int colIndex = (i >= 2) ? i + 1 : i;
                 view.Controls.Add(img.CreatePictureBox(new Point(
-                    start.X + (colIndex * unit.Width),
-                    start.Y
+                    start_cards.X + (colIndex * unit.Width),
+                    start_cards.Y
                 )));
+
+                img.PictureBox.Click += (s, e) => ToggleAddSelection(img);
             }
 
             // La pioche
@@ -118,15 +128,16 @@ namespace Solitaire.Controllers
             trash.PictureBox.Click += (s, e) =>
             {
                 MyImage trash = pickFoundations[1];
-                if (trash.ResourceName == "Background_Green_Slot") return;
+                // if (trash.ResourceName == "Background_Green_Slot") return;
                 ToggleAddSelection(trash);
             };
 
             // Afficher les colonnes des cartes
-            start.X -= unit.Width;
-            start.Y += unit.Height - spacing.Height;
+            start_cards.X -= unit.Width;
+            start_cards.Y += unit.Height - spacing_cards.Height;
             for (int col = NB_COLS; col > 0; col--)
             {
+                List<Card> column = new List<Card>();
                 for (int row = col; row > 0; row--)
                 {
                     if (pickHided.Count == 0) break;
@@ -134,8 +145,8 @@ namespace Solitaire.Controllers
                     bool isLastCardOfColumn = !(col != row);
 
                     PictureBox picbx = card.CreatePictureBox(new Point(
-                        start.X + (col * unit.Width),
-                        start.Y + (row * spacing.Height)
+                        start_cards.X + (col * unit.Width),
+                        start_cards.Y + (row * spacing_cards.Height)
                     ));
 
                     if (row < col)
@@ -146,8 +157,11 @@ namespace Solitaire.Controllers
                     view.Controls.Add(picbx);
                     card.Layout = CardLayout.Board;
                     pickHided.Remove(card);
+                    column.Add(card);
                 }
+                boardColumns.Add(column);
             }
+            boardColumns.Reverse();
         }
 
         /// <summary>
@@ -157,7 +171,7 @@ namespace Solitaire.Controllers
         /// <exception cref="Exception">Erreur indiquant que la carte n'a pas été trouvé</exception>
         private void CardOnClick(Card cardClicked)
         {
-            if (!cardClicked.IsMovable) return;
+            if (!cardClicked.StateMovement.Selectable) return;
             ToggleAddSelection(cardClicked);
         }
 
@@ -166,13 +180,61 @@ namespace Solitaire.Controllers
         /// </summary>
         private void UpdateMovableCardState()
         {
+            // Pioche
             List<Card> pick_hide = deck.Where(c => c.Layout == CardLayout.Pick_Hided).ToList();
             foreach (Card c in pick_hide)
-                c.IsMovable = false;
+            {
+                c.StateMovement.Movable = false;
+                c.StateMovement.Selectable = false;
+            }
 
-            List<Card> board = deck.Where(c => c.Layout == CardLayout.Board).ToList();
-            foreach (Card c in board)
-                c.IsMovable = !c.IsTurned;
+            // Plateau
+            // foreach (List<Card> column in boardColumns)
+            // {
+            //     for (int iCard = 0; iCard < column.Count; iCard++)
+            //     {
+            //         Card card = column[iCard];
+            //         Card? next = (iCard > 0)
+            //             ? column[iCard - 1]
+            //             : null;
+
+            //         Card? previous = (iCard < column.Count - 1)
+            //             ? column[iCard + 1]
+            //             : null;
+
+            //         bool isLastCard = (iCard == 0);
+            //         bool isFirstCard = (iCard == column.Count - 1);
+
+            //         card.StateMovement.Selectable = (
+            //             card.PictureBox != null &&
+            //             !card.IsTurned &&
+            //             ne
+            //         );
+
+            //         card.StateMovement.Movable = true;
+            //     }
+            // }
+
+            // Global selectable
+            List<Card> pick = deck.Where(c => c.Layout == CardLayout.Pick_Hided).ToList();
+            foreach (Card card in deck)
+            {
+                bool select = (card.PictureBox != null && !card.IsTurned);
+                card.StateMovement.Selectable = select;
+                card.StateMovement.Movable = select;
+            }
+
+            // Prendre en compte la pioche
+            MyImage trash = pickFoundations[1];
+            List<Card> showPicked = deck.Where(c => c.Layout == CardLayout.Pick_Showed).ToList();
+            trash.StateMovement.Selectable = (showPicked.Count > 0);
+
+            // DEBUG : afficher les cartes sélectionnées
+            List<MyImage> canBeSelectedCard = deck.Where(c => c.StateMovement.Selectable).ToList<MyImage>();
+            canBeSelectedCard.Add(trash);
+            // foreach (var item in canBeSelectedCard)
+            //     item.Selected = item.StateMovement.Selectable;
+            // MessageBox.Show("updated");
         }
 
         /// <summary>
@@ -195,6 +257,7 @@ namespace Solitaire.Controllers
                 // On tire une carte
                 Card newCard = cardsHided.Last();
                 newCard.Layout = CardLayout.Pick_Showed;
+                newCard.CreatePictureBox(new Point(int.MinValue, int.MinValue));
                 trash.ReplacePictureBoxImage(newCard.ResourceName);
 
                 if (cardsHided.Count == 1)
@@ -224,6 +287,7 @@ namespace Solitaire.Controllers
             }
 
             // Sortie
+            UpdateMovableCardState();
             pickCanClick = !pickCanClick; // ça bloquera ici
         }
 
@@ -236,7 +300,7 @@ namespace Solitaire.Controllers
             int limitSelectedCard = 2;
             var clearSelect = () =>
             {
-                foreach (Card c in selectedCards)
+                foreach (MyImage c in selectedCards)
                     c.Selected = false;
                 selectedCards.Clear();
             };
@@ -245,20 +309,65 @@ namespace Solitaire.Controllers
             if (selectedCards.Count >= limitSelectedCard)
                 clearSelect();
 
-
             // Ajouter la carte
-            if (!selectedCards.Contains(card))
-            {
-                selectedCards.Add(card);
-                card.Selected = true;
-            }
+            if (
+                selectedCards.Contains(card) &&
+                (
+                    card.ResourceName == "Background_Green_Slot" ||
+                    card.ResourceName == "Deck"
+                )
+            ) return;
+
+            selectedCards.Add(card);
+            card.Selected = true;
 
             // Si deux cartes sont séléctionnés
             if (selectedCards.Count == limitSelectedCard)
             {
-                // throw new NotImplementedException();
-                // MessageBox.Show("Mettre les règles ici");
+                MyImage card1 = selectedCards[0];
+                MyImage card2 = selectedCards[1];
+
+                if (card1 is Card && card2 is Card)
+                {
+                    Card selectedCard1 = (Card)card1;
+                    Card selectedCard2 = (Card)card2;
+
+                    bool isValidMove =
+                        selectedCard1.Value == selectedCard2.Value - 1 &&
+                        selectedCard1.CardColor != selectedCard2.CardColor;
+
+                    if (selectedCard1.Value < selectedCard2.Value)
+                    {
+                        // Bouger la carte
+                        selectedCard2.AppendChild(selectedCard1, spacing_cards.Height);
+                        MoveCardBetweenColumns(selectedCard1, selectedCard2);
+
+                        // Retourner la carte derrière
+                        int card1Index = deck.FindIndex(c => c == card1);
+                        Card previousCard = deck[card1Index - 1];
+                        previousCard.Flip();
+                    }
+                }
+
+                // On clear la séléction
+                clearSelect();
+                UpdateMovableCardState();
             }
+        }
+
+        private void MoveCardBetweenColumns(Card moving, Card target)
+        {
+            List<Card>? fromColumn = boardColumns
+                .FirstOrDefault(col => col.Contains(moving));
+
+            List<Card>? toColumn = boardColumns
+                .FirstOrDefault(col => col.Contains(target));
+
+            if (fromColumn == null || toColumn == null)
+                return;
+
+            fromColumn.Remove(moving);
+            toColumn.Add(moving);
         }
     }
 }
